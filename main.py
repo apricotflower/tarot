@@ -124,64 +124,77 @@ def get_valid_spread_len(cards_len):
         raise ValueError("Invalid input. Please enter a valid number of cards for the spread (请输入正确牌阵所需牌数)。")
 
 
-def get_unique_card_indices(spread_len):
-    indices = []
-    while len(indices) < spread_len:
-        i = len(indices) + 1
-        try:
-            index = int(input(f"The {ordinal(i)} card(第{i}张牌): "))
-            if 1 <= index <= 78 and index not in indices:
-                indices.append(index)
-            else:
-                raise ValueError("Invalid input. Please enter a valid integer (无效输入。请输入正确的数字)。")
-        except ValueError as e:
-            pass
-            print(e)
-    return indices
+def get_unique_card_indices(index, indices):
+    print(index)
+    try:
+        index = int(index)
+    except ValueError:
+        raise ValueError("Invalid input. Please enter a valid integer (无效输入。请输入正确的数字)。")
+
+    if 1 <= index <= 78 and index not in indices:
+        return index
+    else:
+        raise ValueError("Invalid input. Please enter a valid integer (无效输入。请输入正确的数字)。")
 
 
-def pick_cards(question, cur_tarot_array):
-    while True:
-        try:
-            spread_len = get_valid_spread_len(input("\nPlease enter the number of cards needed for the spread ("
-                                                    "请输入牌阵所需牌数): "))
-            break
-        except ValueError as e:
-            pass
-            print(e)
-
-    indices = get_unique_card_indices(spread_len)
-
-    cards_values = [cur_tarot_array[index - 1] for index in indices]
-    print(f"\nQuestion(问题)： {question}")
-    for i, value in enumerate(cards_values, start=1):
-        print(f"The {ordinal(i)} card(第{i}张牌) : {value} {interpret_orientation(value)}")
+def get_question(question):
+    if not question:
+        raise ValueError("Please enter a question before picking cards.")
+    return question
 
 
-def run():
-    question = input("Question(问题): ")
-    question_finished = False
-    # global cur_tarot_array
-    cur_tarot_array = []
-    cur_tarot_array = shuffle(cur_tarot_array)
-    while True:
-        try:
-            if question_finished:
-                question = input("\nQuestion(问题): ")
-                question_finished = False
-            start_shuffle = input("Shuffle?(Y/N)(是否洗牌？): ").lower()
-            if start_shuffle == "y":
-                shuffle(cur_tarot_array)
-            elif start_shuffle == "n":
-                pick_cards(question, cur_tarot_array)
-                question_finished = True
-            elif start_shuffle == "exit":
-                break  # exit the loop
-            else:
-                raise ValueError("Invalid input. Please enter 'Y' or 'N' (or 'exit' to quit).")
-        except ValueError as e:
-            print(e)
-
-
-if __name__ == "__main__":
-    run()
+# def pick_cards(question, cur_tarot_array):
+#     while True:
+#         try:
+#             spread_len = get_valid_spread_len(input("\nPlease enter the number of cards needed for the spread ("
+#                                                     "请输入牌阵所需牌数): "))
+#             break
+#         except ValueError as e:
+#             pass
+#             print(e)
+#
+#     indices = []
+#     while len(indices) < spread_len:
+#         i = len(indices) + 1
+#         try:
+#             index = get_unique_card_indices(input(
+#                 f"Choose Card {i},The {ordinal(i)} card. {spread_len} cards totally (第{i}张牌。共{spread_len}张牌):"),
+#                                             indices)
+#             indices.append(index)
+#         except ValueError as e:
+#             pass
+#             print(e)
+#
+#     cards_values = [cur_tarot_array[index - 1] for index in indices]
+#     print(f"\nQuestion(问题)： {question}")
+#     for i, value in enumerate(cards_values, start=1):
+#         print(f"The {ordinal(i)} card(第{i}张牌) : {value} {interpret_orientation(value)}")
+#
+#
+# def run():
+#     question = input("Question(问题): ")
+#     question_finished = False
+#     # global cur_tarot_array
+#     cur_tarot_array = []
+#     cur_tarot_array = shuffle(cur_tarot_array)
+#     while True:
+#         try:
+#             if question_finished:
+#                 question = input("\nQuestion(问题): ")
+#                 question_finished = False
+#             start_shuffle = input("Shuffle?(Y/N)(是否洗牌？): ").lower()
+#             if start_shuffle == "y":
+#                 shuffle(cur_tarot_array)
+#             elif start_shuffle == "n":
+#                 pick_cards(question, cur_tarot_array)
+#                 question_finished = True
+#             elif start_shuffle == "exit":
+#                 break  # exit the loop
+#             else:
+#                 raise ValueError("Invalid input. Please enter 'Y' or 'N' (or 'exit' to quit).")
+#         except ValueError as e:
+#             print(e)
+#
+#
+# if __name__ == "__main__":
+#     run()
