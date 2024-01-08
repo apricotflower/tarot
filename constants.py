@@ -1,11 +1,14 @@
 class ErrorMessages:
     QUESTION_VALUE_ERROR = "Please enter a question before picking cards.(请在抽牌前输入问题)"
-    CARDS_NEED_VALUE_ERROR = "Invalid input. Please enter a valid number of cards for the spread (请输入正确牌阵所需牌数)。"
-    CARD_INDEX_VALUE_ERROR = "Invalid input. Please enter a valid integer (无效输入。请输入正确的数字)。"
+    CARDS_NEED_VALUE_ERROR = "Invalid input: {}. Please enter a valid number of cards for the spread (请输入正确牌阵所需牌数)。"
+    CARD_INDEX_VALUE_ERROR = "Invalid input: {}. Please enter a valid integer (无效输入。请输入正确的数字)。"
 
 
 class UIConstants:
     ROOT_TITLE = "Tarot Divination"
+    ROOT_INIT_WIN_WIDTH = 450
+    ROOT_INIT_WIN_HEIGHT = 100
+    ROOT_ADJUSTED_WIN_HEIGHT = 260
 
     QUESTION = "Question(问题):"
 
@@ -19,6 +22,8 @@ class UIConstants:
 
     CARDS_NEED = "Please enter the number of cards needed for the spread (请输入牌阵所需牌数):"
     NUMBER_OF_CARDS = "Number of cards in the spread(牌阵牌数): "
+
+    CARDS_VALUE = "The {} card. {} cards totally (第{}张卡。共{}张牌):"
 
     QUIT = "Do you want to quit?(是否退出？)"
 
@@ -106,3 +111,4 @@ class Tarot:
     }
     ORIENTATION_UPRIGHT = "Upright (正)"
     ORIENTATION_REVERSED = "Reversed (逆)"
+    TAROT_LEN = 78

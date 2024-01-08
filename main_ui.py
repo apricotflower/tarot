@@ -5,6 +5,7 @@ import data_processing
 from constants import ErrorMessages, UIConstants
 
 cur_tarot_array = data_processing.shuffle()
+result_scrollbar_created = False
 
 
 class TarotApp:
@@ -17,8 +18,8 @@ class TarotApp:
         screen_height = root.winfo_screenheight()
 
         # 设置窗口的宽度和高度
-        window_width = 450
-        window_height = 100
+        window_width = UIConstants.ROOT_INIT_WIN_WIDTH
+        window_height = UIConstants.ROOT_INIT_WIN_HEIGHT
 
         # 计算窗口放置在屏幕中央的坐标
         x = (screen_width - window_width) // 2
@@ -29,26 +30,18 @@ class TarotApp:
 
         # 设置窗口的geometry
         self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
-        # self.root.geometry("")
 
         # 设置窗口的最小尺寸
         root.minsize(width=450, height=100)
+        # root.maxsize(width=450, height=100)
 
         self.create_widgets()
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        # 创建一个Canvas用于显示卡牌结果
+        # Create canvas and frame for showing result
         self.result_canvas = tk.Canvas(self.paned_window)
         self.result_canvas.pack(side=tk.LEFT, expand=True, fill='both')
 
-        # 创建一个滚动条
-        self.result_scrollbar = tk.Scrollbar(self.paned_window, orient=tk.VERTICAL, command=self.result_canvas.yview)
-        self.result_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-        # 将Canvas的yview与滚动条关联
-        self.result_canvas.configure(yscrollcommand=self.result_scrollbar.set)
-
-        # 创建一个Frame，用于放置卡牌结果
         self.result_frame = tk.Frame(self.result_canvas)
         self.result_canvas.create_window((0, 0), window=self.result_frame, anchor=tk.NW)
 
@@ -110,46 +103,45 @@ class TarotApp:
                 return
 
         # each card index
-        indices = []
-        while len(indices) < spread_len:
-            i = len(indices) + 1
+        cards_value = []
+        while len(cards_value) < spread_len:
+            i = len(cards_value) + 1
             try:
-                index = data_processing.get_unique_card_indices(tk.simpledialog.askstring(f"{', '.join(map(str, indices))}",
-                                                                               f"The {data_processing.ordinal(i)} card. {spread_len} cards totally (第{i}张卡。共{spread_len}张牌):"),
-                                                     indices)
-                indices.append(index)
+                value = data_processing.get_unique_card_value(tk.simpledialog.askstring(', '.join(map(str, [card[0] for card in cards_value])),
+                                                                               UIConstants.CARDS_VALUE.format(data_processing.ordinal(i), spread_len, i, spread_len)), cards_value)
+                cards_value.append(value)
             except ValueError as e:
                 pass
+                print(e)
                 messagebox.showerror("Card Index Value Error", str(e))
             except TypeError:
                 return
 
-        # Each card value
-        global cur_tarot_array
-        cards_values = [cur_tarot_array[index - 1] for index in indices]
+        # Result generate
+        global result_scrollbar_created
+        if not result_scrollbar_created:
+            result_scrollbar_created = True
+            result_scrollbar = tk.Scrollbar(self.paned_window, orient=tk.VERTICAL, command=self.result_canvas.yview)
+            result_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            self.result_canvas.configure(yscrollcommand=result_scrollbar.set)
+            root.geometry(f"{UIConstants.ROOT_INIT_WIN_WIDTH}x{UIConstants.ROOT_ADJUSTED_WIN_HEIGHT}")
 
-        # result generate
-        root.geometry(f"450x260")
         new_result_frame = tk.Frame(self.result_frame)
         new_result_frame.pack()
 
-        # 添加你的标签和其他控件到Frame中
         tk.Label(new_result_frame, text=f"\n{UIConstants.QUESTION} {question}").pack()
         tk.Label(new_result_frame, text=f"{UIConstants.NUMBER_OF_CARDS} {spread_len}").pack()
 
-        for i, value in enumerate(cards_values, start=1):
-            card_text = f"The {data_processing.ordinal(i)} card(第{i}张牌) : {data_processing.interpret_orientation(value)}"
+        # Each card value
+        for i, value in enumerate(cards_value, start=1):
+            card_text = f"The {data_processing.ordinal(i)} card(第{i}张牌) : {value[1]}"
             tk.Label(new_result_frame, text=card_text).pack()
 
-        # 更新Canvas的大小
         new_result_frame.update_idletasks()
-
-        # 配置Canvas的滚动区域
         self.result_canvas.config(scrollregion=self.result_canvas.bbox("all"))
-
-        # 打开滚动区域的更新
         self.result_canvas.update_idletasks()
 
+        # 清空Question区域
         self.question_entry.delete(0, 'end')
         question = ""
 
